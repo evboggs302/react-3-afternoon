@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
+import axios from "axios";
 
-import './App.css';
+import "./App.css";
 
-import Header from './Header/Header';
-import Compose from './Compose/Compose';
+import Header from "./Header/Header";
+import Compose from "./Compose/Compose";
+import Post from "../components/Post/Post";
 
 class App extends Component {
   constructor() {
@@ -13,25 +15,55 @@ class App extends Component {
       posts: []
     };
 
-    this.updatePost = this.updatePost.bind( this );
-    this.deletePost = this.deletePost.bind( this );
-    this.createPost = this.createPost.bind( this );
+    this.updatePost = this.updatePost.bind(this);
+    this.deletePost = this.deletePost.bind(this);
+    this.createPost = this.createPost.bind(this);
   }
-  
+
   componentDidMount() {
-
+    axios
+      .get(`https://practiceapi.devmountain.com/api/posts`)
+      .then(response => {
+        this.setState({
+          posts: response.data
+        });
+        console.log(response);
+      });
   }
 
-  updatePost() {
-  
+  updatePost(id, text) {
+    axios
+      .put(`https://practiceapi.devmountain.com/api/posts?id=${id}`, { text })
+      .then(response => {
+        this.setState({
+          posts: response.data
+        });
+        console.log(response);
+      });
   }
 
-  deletePost() {
-
+  deletePost(id) {
+    axios
+      .delete(`https://practiceapi.devmountain.com/api/posts?id=${id}`)
+      .then(response => {
+        this.setState({
+          posts: response.data
+        });
+        console.log(response);
+      });
   }
 
-  createPost() {
+  // What's better than buried treasure? Pirate's Booty https://piratebrands.com/
 
+  createPost(text) {
+    axios
+      .post(`https://practiceapi.devmountain.com/api/posts`, { text })
+      .then(response => {
+        this.setState({
+          posts: response.data
+        });
+        console.log(response);
+      });
   }
 
   render() {
@@ -42,9 +74,18 @@ class App extends Component {
         <Header />
 
         <section className="App__content">
-
-          <Compose />
-          
+          <Compose createPostFn={this.createPost} />
+          {posts.map(posts => {
+            return (
+              <Post
+                id={posts.id}
+                text={posts.text}
+                date={posts.date}
+                deletePostFn={this.deletePost}
+                updatePostFn={this.updatePost}
+              />
+            );
+          })}
         </section>
       </div>
     );
